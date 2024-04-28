@@ -29,17 +29,21 @@ int crear_conexion(char *ip, char* puerto)
 	getaddrinfo(ip, puerto, &hints, &server_info);
 
 	// Ahora vamos a crear el socket.
-	int socket_cliente = 0;
+	int fd_conexion = socket(server_info->ai_family,
+                         	server_info->ai_socktype,
+                         	server_info->ai_protocol);
 
 	// Ahora que tenemos el socket, vamos a conectarlo
-
+	if(connect(fd_conexion, server_info->ai_addr, server_info->ai_addrlen) == -1) {
+		printf("Error intentando conectar el Cliente con el Servidor.");
+	}
 
 	freeaddrinfo(server_info);
 
-	return socket_cliente;
+	return fd_conexion;
 }
 
-void enviar_mensaje(char* mensaje, int socket_cliente)
+void enviar_mensaje(char* mensaje, int fd_conexion)
 {
 	t_paquete* paquete = malloc(sizeof(t_paquete));
 
@@ -53,7 +57,7 @@ void enviar_mensaje(char* mensaje, int socket_cliente)
 
 	void* a_enviar = serializar_paquete(paquete, bytes);
 
-	send(socket_cliente, a_enviar, bytes, 0);
+	send(fd_conexion, a_enviar, bytes, 0);
 
 	free(a_enviar);
 	eliminar_paquete(paquete);
@@ -85,12 +89,12 @@ void agregar_a_paquete(t_paquete* paquete, void* valor, int tamanio)
 	paquete->buffer->size += tamanio + sizeof(int);
 }
 
-void enviar_paquete(t_paquete* paquete, int socket_cliente)
+void enviar_paquete(t_paquete* paquete, int fd_conexion)
 {
 	int bytes = paquete->buffer->size + 2*sizeof(int);
 	void* a_enviar = serializar_paquete(paquete, bytes);
 
-	send(socket_cliente, a_enviar, bytes, 0);
+	send(fd_conexion, a_enviar, bytes, 0);
 
 	free(a_enviar);
 }
@@ -102,7 +106,7 @@ void eliminar_paquete(t_paquete* paquete)
 	free(paquete);
 }
 
-void liberar_conexion(int socket_cliente)
+void liberar_conexion(int fd_conexion)
 {
-	close(socket_cliente);
+	close(fd_conexion);
 }

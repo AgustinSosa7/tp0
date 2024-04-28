@@ -31,11 +31,11 @@ typedef struct
 
 
 int crear_conexion(char* ip, char* puerto);
-void enviar_mensaje(char* mensaje, int socket_cliente);
+void enviar_mensaje(char* mensaje, int fd_conexion);
 t_paquete* crear_paquete(void);
 void agregar_a_paquete(t_paquete* paquete, void* valor, int tamanio);
-void enviar_paquete(t_paquete* paquete, int socket_cliente);
-void liberar_conexion(int socket_cliente);
+void enviar_paquete(t_paquete* paquete, int fd_conexion);
+void liberar_conexion(int fd_conexion);
 void eliminar_paquete(t_paquete* paquete);
 
 #endif /* UTILS_H_ */
