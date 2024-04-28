@@ -57,6 +57,8 @@ int main(void)
 
 	/*---------------------------------------------------PARTE 5-------------------------------------------------------------*/
 	// Proximamente
+
+	printf("Cliente CERRADO! \n");
 }
 
 t_log* iniciar_logger(void)
@@ -83,17 +85,16 @@ void leer_consola(t_log* logger)
 {
 	char* leido;
 
-	while (1) {
-        leido = readline("> ");
-
-        if (strcmp(leido, "") == 0) {	// Otras opciones: string_is_empty(leido)) / strlen(leido) == 0 / leido == NULL no me funciono.
-            free(leido);
-			break;
-        }
-		log_info(logger, leido);
-        free(leido);
+	// La primera te la dejo de yapa
+	leido = readline("> ");
+	
+	// El resto, las vamos leyendo y logueando hasta recibir un string vacio
+	while (strcmp(leido, "") != 0) {	// Otras opciones: string_is_empty(leido)) / strlen(leido) == 0 / leido == NULL no me funciono.
+        log_info(logger, leido);
+		free(leido);
+		leido = readline("> ");
     }
-
+	free(leido);
 }
 
 void paquete(int fd_conexion)
@@ -101,18 +102,14 @@ void paquete(int fd_conexion)
 	// Ahora toca lo divertido!
 	char* leido;
 	t_paquete* paquete = crear_paquete();
-	printf("Ingrese las palabras a enviar (dentro de un paquete): \n");
+	printf("\nIngrese las palabras a enviar (dentro de un paquete): \n");
 
 	// Leemos y esta vez agregamos las lineas al paquete
-	while (1) {
-        leido = readline(">");
-
-        if (strcmp(leido, "") == 0) {	// Otras opciones: string_is_empty(leido)) / strlen(leido) == 0 / leido == NULL no me funciono.
-            break;
-        }
-		int tamanio = string_length(leido) + 1;
-		agregar_a_paquete(paquete, leido, tamanio);
-        free(leido);
+	leido = readline("> ");
+	while (strcmp(leido, "") != 0) {	// Otras opciones: string_is_empty(leido)) / strlen(leido) == 0 / leido == NULL no me funciono.
+        agregar_a_paquete(paquete, leido, string_length(leido) + 1);
+		free(leido);
+		leido = readline("> ");
     }
 	enviar_paquete(paquete, fd_conexion);
 
